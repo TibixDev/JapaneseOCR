@@ -48,11 +48,13 @@ function toggleFileSelect() {
 }
 
 function processImageFileSelect(event) {
+    console.log("🚀 ~ file: Home.vue:51 ~ processImageFileSelect ~ event:", event)
+    console.log("🚀 ~ file: Home.vue:51 ~ processImageFileSelect ~ eventFiles:", event.target.files[0])
     event.preventDefault();
     loading = true;
     let file;
     try {
-        if (event.dataTransfer.items) {
+        if (event?.dataTransfer?.items) {
             // Use DataTransferItemList interface to access the file(s)
             if (event.dataTransfer.items[0].kind === 'file') {
                 const lFile = event.dataTransfer.items[0].getAsFile();
@@ -62,9 +64,17 @@ function processImageFileSelect(event) {
                     file = URL.createObjectURL(lFile);
                 }
             }
-        } else {
+        } else if (event.dataTransfer?.files) {
             // Use DataTransfer interface to access the file(s)
             const lFile = event.dataTransfer.files[0];
+            console.log(`[FileDrop] Type: ${lFile.type}`);
+            if (lFile.type.includes("image")) {
+                console.log(`[FileDrop] Setting image source to ${lFile.name}`);
+                file = URL.createObjectURL(lFile);
+            }
+        } else {
+            // Use target files interface to access the file(s)
+            const lFile = event.target.files[0];
             console.log(`[FileDrop] Type: ${lFile.type}`);
             if (lFile.type.includes("image")) {
                 console.log(`[FileDrop] Setting image source to ${lFile.name}`);
@@ -83,7 +93,7 @@ function processImageFileSelect(event) {
             loading = false;
         })
     } catch(e) {
-        console.error("You have done a fucky-wucky oopsey doopsie!.", e);
+        console.error("An error occured.", e);
         loading = false;
         swal({
             icon: "error",
